@@ -18,8 +18,13 @@ import com.example.newsclient.domain.usecase.GetNewsHeadlinesUseCase
 import com.example.newsclient.domain.usecase.GetSavedNewsUseCase
 import com.example.newsclient.domain.usecase.GetSearchedNewsUseCase
 import com.example.newsclient.domain.usecase.SaveNewsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class NewsViewModel(
     private val appContext: Application,
@@ -30,37 +35,40 @@ class NewsViewModel(
     private val deleteSavedNewsUseCase: DeleteSavedNewsUseCase
 ): AndroidViewModel(appContext) {
 
-    val newsHeadLines: MutableLiveData<Resource<APIResponse>> = MutableLiveData()
-    val searchedNewsList: MutableLiveData<Resource<APIResponse>> = MutableLiveData()
+    private val _newsHeadlines = MutableStateFlow<Resource<APIResponse>>(Resource.Loading())
+    val newsHeadlines: StateFlow<Resource<APIResponse>> = _newsHeadlines
 
-    fun getNewsHeadLines(country: String, page: Int){
+    private val _searchedNewsList = MutableStateFlow<Resource<APIResponse>>(Resource.Loading())
+    val searchedNewsList: StateFlow<Resource<APIResponse>> = _searchedNewsList
+
+
+    fun getNewsHeadlines(country: String, page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            newsHeadLines.postValue(Resource.Loading())
+            _newsHeadlines.value = Resource.Loading()
             try {
                 if (isNetworkAvailable(appContext)) {
                     val apiResult = getNewsHeadlinesUseCase.execute(country, page)
-                    newsHeadLines.postValue(apiResult)
+                    _newsHeadlines.value = apiResult
                 } else {
-                    newsHeadLines.postValue(Resource.Error("Internet not available!!!"))
+                    _newsHeadlines.value = Resource.Error("Internet not available!!!")
                 }
-            }catch (e: Exception){
-                newsHeadLines.postValue(Resource.Error(e.message.toString()))
+            } catch (e: Exception) {
+                _newsHeadlines.value = Resource.Error(e.message.toString())
             }
         }
     }
 
-    //Search
-    fun getSearchedNews(country: String, searchedQuery: String, page: Int){
+    fun getSearchedNews(country: String, searchedQuery: String, page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                if (isNetworkAvailable(appContext)){
+                if (isNetworkAvailable(appContext)) {
                     val apiResult = getSearchedNewsUseCase.execute(country, searchedQuery, page)
-                    searchedNewsList.postValue(apiResult)
-                }else {
-                    searchedNewsList.postValue(Resource.Error("Internet not available!!!"))
+                    _searchedNewsList.value = apiResult
+                } else {
+                    _searchedNewsList.value = Resource.Error("Internet not available!!!")
                 }
-            }catch (e: Exception){
-                searchedNewsList.postValue(Resource.Error(e.message.toString()))
+            } catch (e: Exception) {
+                _searchedNewsList.value = Resource.Error(e.message.toString())
             }
         }
     }

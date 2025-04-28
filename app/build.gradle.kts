@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
 
     // Hilt dependencies
     implementation("com.google.dagger:hilt-android:2.51.1")

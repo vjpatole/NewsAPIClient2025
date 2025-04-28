@@ -14,17 +14,17 @@ data class Article(
     @SerializedName("id")
     var id: Int? = null,
     @SerializedName("author")
-    val author: String?,
+    val author: String = "",
     @SerializedName("content")
     val content: String?,
     @SerializedName("description")
-    val description: String?,
+    val description: String = "",
     @SerializedName("publishedAt")
     val publishedAt: String?,
     @SerializedName("source")
     val source: Source?,
     @SerializedName("title")
-    val title: String?,
+    val title: String = "",
     @SerializedName("url")
     val url: String?,
     @SerializedName("urlToImage")

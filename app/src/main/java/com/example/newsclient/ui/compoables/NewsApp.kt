@@ -12,14 +12,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.newsclient.ui.viewmodel.NewsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewsApp(navController: NavHostController, modifier: Modifier) {
+fun NewsApp(
+    navController: NavHostController,
+    modifier: Modifier,
+    newsViewModel: NewsViewModel
+) {
     var screenTitle by remember { mutableStateOf("News List") }
 
     // Observe navigation changes to update the title
@@ -44,7 +50,7 @@ fun NewsApp(navController: NavHostController, modifier: Modifier) {
             startDestination = "newsList",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("newsList") { NewsListScreen(navController) }
+            composable("newsList") { NewsListScreen(navController, newsViewModel) }
             composable("newsDetail/{url}") { backStackEntry ->
                 val url = backStackEntry.arguments?.getString("url") ?: ""
                 requireNotNull(url)
